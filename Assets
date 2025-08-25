@@ -1,0 +1,299 @@
+import pyttsx3
+import pywhatkit
+import datetime
+import wikipedia
+import os
+import subprocess
+import platform
+import smtplib
+import requests
+import json
+import speech_recognition as sr 
+from deep_translator import GoogleTranslator
+import openai  # OpenAI for AI Chat
+import random
+import webbrowser
+from bs4 import BeautifulSoup
+import requests
+
+
+app = Flask(__name__)
+CORS(app)  # Allow Angular to connect
+
+
+# Initialize voice engine
+engine = pyttsx3.init()
+engine.setProperty('rate', 170)
+engine.setProperty('volume', 1)
+
+# OpenAI API Key (Get yours from https://platform.openai.com/)
+OPENAI_API_KEY = "your_openai_api_key"
+
+def speak(text, voice="Samantha"):  # Use an available female voice
+    os.system(f'say -v {voice} "{text}"')
+
+def listen():
+    """Listen to user commands."""
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        recognizer.adjust_for_ambient_noise(source)
+        audio = recognizer.listen(source)
+    
+    try:
+        command = recognizer.recognize_google(audio).lower()
+        print(f"You said: {command}")
+        return command
+    except sr.UnknownValueError:
+        speak("Sorry, I couldn't understand. Can you repeat?")
+        return ""
+    except sr.RequestError:
+        speak("There seems to be an issue with the speech service.")
+        return ""
+
+def open_whatsapp():
+    """Open WhatsApp on macOS"""
+    speak("Opening WhatsApp")
+    subprocess.run(["open", "-a", "WhatsApp"])
+
+def get_weather(city="India"):
+    API_KEY = "your_openweathermap_api_key"
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+    
+    try:
+        response = requests.get(url)
+        data = response.json()
+        if data.get("cod") == 200:
+            temp = data["main"]["temp"]
+            weather_desc = data["weather"][0]["description"]
+            speak(f"The temperature in {city} is {temp} degrees Celsius with {weather_desc}")
+        else:
+            speak("Sorry, I couldn't fetch the weather.")
+    except Exception as e:
+        speak(f"There was an error retrieving the weather: {str(e)}")
+
+
+def send_email(to_email, subject, message):
+    """Send an email using Gmail"""
+    sender_email = "your_email@gmail.com"
+    sender_password = "your_password"
+
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        email_message = f"Subject: {subject}\n\n{message}"
+        server.sendmail(sender_email, to_email, email_message)
+        server.quit()
+        speak("Email has been sent successfully.")
+    except:
+        speak("Sorry, I was unable to send the email.")
+
+def control_mac(command):
+    print(f"Executing command: {command}")  # Debugging line
+    
+    if "shutdown" in command:
+        speak("Shutting down your system.")
+        os.system("sudo shutdown -h now")
+    
+    elif "restart" in command:
+        speak("Restarting your system.")
+        os.system("sudo shutdown -r now")
+    
+    elif "sleep" in command:
+        speak("Putting system to sleep.")
+        os.system("pmset sleepnow")
+    
+    elif "increase brightness" in command:
+        os.system("osascript -e 'tell application \"System Events\" to key code 144'")
+        speak("Brightness increased.")
+    
+    elif "decrease brightness" in command:
+        os.system("osascript -e 'tell application \"System Events\" to key code 145'")
+        speak("Brightness decreased.")
+    
+    elif "increase volume" in command:
+        os.system("osascript -e 'set volume output volume (output volume of (get volume settings) + 10)'")
+        speak("Volume increased.")
+    
+    elif "decrease volume" in command:
+        os.system("osascript -e 'set volume output volume (output volume of (get volume settings) - 10)'")
+        speak("Volume decreased.")
+    
+    elif "mute" in command:
+        os.system("osascript -e 'set volume output muted true'")
+        speak("Muted.")
+    
+    elif "unmute" in command:
+        os.system("osascript -e 'set volume output muted false'")
+        speak("Unmuted.")
+    
+    elif "open bluetooth" in command:
+        os.system("open -a 'Bluetooth File Exchange'")
+        speak("Bluetooth settings opened.")
+    
+    elif "open wi-fi settings" in command:
+        os.system("open /System/Library/PreferencePanes/Network.prefPane")
+        speak("WiFi settings opened.")
+    
+    elif "turn on wi-fi" in command:
+        os.system("networksetup -setairportpower en0 on")
+        speak("WiFi turned on.")
+    
+    elif "turn off wi-fi" in command:
+        os.system("networksetup -setairportpower en0 off")
+        speak("WiFi turned off.")
+    
+    elif "open notes" in command:
+        speak("Opening Notes.")
+        os.system("open -a Notes")
+    
+    elif "open finder" in command:
+        speak("Opening Finder.")
+        os.system("open -a Finder")
+    
+    elif "show desktop" in command:
+        os.system("osascript -e 'tell application \"System Events\" to key code 103'")
+        speak("Showing desktop.")
+    
+    elif "hide all windows" in command:
+        os.system("osascript -e 'tell application \"System Events\" to key code 36'")
+        speak("Hiding all windows.")
+    
+    else:
+        speak("Sorry, I couldn't execute the command.")
+        print("Command not recognized.")
+
+def translate_text(text, target_language="es"):
+    """Translate text into a different language."""
+    try:
+        translated_text = GoogleTranslator(source="auto", target=target_language).translate(text)
+        print(f"Translated: {translated_text}")
+        speak(f"The translation is: {translated_text}")
+    except Exception as e:
+        speak("Sorry, I couldn't translate the text.")
+        print(f"Translation error: {e}")
+
+import requests
+
+def get_news_gnews():
+    """Fetch India's latest news headlines using GNews API."""
+    API_KEY = "ed39bfd5a31e4fd0a776802285719e8d"  # Replace with your GNews API key
+    url = f"https://gnews.io/api/v4/top-headlines?country=in&token={API_KEY}"
+
+    try:
+        response = requests.get(url)
+        data = response.json()
+        
+        print("Full API Response:", data)
+
+        if "articles" in data and data["articles"]:
+            speak("Here are the latest news headlines in India.")
+            for i, article in enumerate(data["articles"][:5], 1):
+                title = article.get("title", "No title available")
+                print(f"News {i}: {title}")
+                speak(f"News {i}: {title}")
+                time.sleep(1)
+        else:
+            speak("No news articles found. Please check the API key.")
+    
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        speak(f"Error retrieving news: {str(e)}")
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Debugging output
+        speak(f"Error retrieving news: {str(e)}")
+    
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Debugging line
+        speak(f"Error retrieving news: {str(e)}")
+
+    
+
+    except Exception as e:
+        speak(f"Error retrieving news: {str(e)}")
+def chat_with_ai(prompt):
+    """Chat with AI using OpenAI GPT"""
+    openai.api_key = OPENAI_API_KEY
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        reply = response["choices"][0]["message"]["content"]
+        speak(reply)
+    except Exception as e:
+        speak("Sorry, I couldn't fetch a response.")
+        print(f"AI Chat Error: {e}")
+
+def run_jarvis():
+    """Main function to handle commands."""
+    while True:
+        command = listen()
+
+        if not command:
+            continue
+
+        if "hello" in command:
+            speak("Hello! How can I assist you?")
+
+        elif "time" in command:
+            current_time = datetime.datetime.now().strftime("%I:%M %p")
+            speak(f"The current time is {current_time}")
+
+        elif "play" in command:
+            song = command.replace("play", "").strip()
+            speak(f"Playing {song} on YouTube")
+            pywhatkit.playonyt(song)
+
+        elif "stop music" in command:
+            speak("Stopping music")
+            os.system("osascript -e 'tell application \"Music\" to pause'")
+
+        elif "open whatsapp" in command:
+            open_whatsapp()
+
+        elif "search" in command:
+            query = command.replace("search", "").strip()
+            speak(f"Searching for {query} on Google.")
+            webbrowser.open(f"https://www.google.com/search?q={query}")
+
+        elif "weather" in command:
+            speak("Which city?")
+            city = listen()
+            speak(f"Fetching weather details for {city}")
+            get_weather(city)
+
+        elif "control" in command:
+            control_mac(command)
+
+        elif "news" in command or "headlines" in command:
+            speak("Fetching the latest news.")
+            get_news_gnews()
+
+           
+
+        elif "translate" in command:
+            speak("What text should I translate?")
+            text = listen()
+            speak("Which language?")
+            lang = listen()
+            translate_text(text, lang)
+
+        elif "chat" in command:
+            speak("What do you want to ask?")
+            user_query = listen()
+            chat_with_ai(user_query)
+
+        elif "exit" in command:
+            speak("Goodbye! Have a great day.")
+            break
+
+        else:
+            speak("Sorry, I didn't understand that. Can you repeat?")
+
+# Run Jarvis
+if __name__ == "__main__":
+    speak("Jarvis activated. How can I assist you sir ?")
+    run_jarvis()
