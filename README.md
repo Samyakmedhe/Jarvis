@@ -19,7 +19,7 @@ Jarvis/
 ├── voice.mp3 # Sample audio file
 └── frontend/ # Angular frontend (separate folder)
 
-🎤 Features
+## 🎤 Features
 Voice Interaction (SpeechRecognition + pyttsx3)
 System Control (shutdown, restart, sleep, brightness, volume, WiFi, Bluetooth, Finder, Notes, etc.)
 Translation (using Google Translator API)
