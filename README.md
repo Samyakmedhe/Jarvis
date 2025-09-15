@@ -5,6 +5,16 @@ It can listen, process, and execute commands like controlling system functions, 
 
 ---
 
+## 🚀 Demo UI
+
+Here’s how Jarvis looks in action:
+
+![Jarvis AI UI](./Assets/jarvis_ui.png)
+
+*(screenshot from the Angular frontend interface)*
+
+---
+
 ## 📂 Project Structure
 
 Jarvis/
@@ -26,5 +36,11 @@ Translation (using Google Translator API)
 Google Search & YouTube Play
 Date & Time Reporting
 Cross-platform API for Angular frontend
+
+## 🛠 Tech Stack
+Backend: Python, Flask, Flask-CORS
+Frontend: Angular, TypeScript
+AI & Voice: pyttsx3, SpeechRecognition, OpenAI API, Deep Translator
+Utilities: pywhatkit, Wikipedia, smtplib
 
 
