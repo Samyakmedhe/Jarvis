@@ -9,7 +9,8 @@ It can listen, process, and execute commands like controlling system functions, 
 
 Here’s how Jarvis looks in action:
 
-![Jarvis AI UI](./Assets/jarvis_ui.png)
+![Jarvis AI UI](![Uploading Jarvis.png…]()
+)
 
 *(screenshot from the Angular frontend interface)*
 
