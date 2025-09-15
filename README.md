@@ -1,20 +1,19 @@
-# 🤖 Jarvis – AI Assistant with Python + Angular
+<img width="1710" height="981" alt="Jarvis" src="https://github.com/user-attachments/assets/b6df9a3b-9982-4723-bc9a-a68ce0a32bd7" /># 🤖 Jarvis – AI Assistant with Python + Angular
 
 Jarvis is a voice-powered AI assistant built with a **Python backend (Flask)** and an **Angular frontend**.  
 It can listen, process, and execute commands like controlling system functions, playing music, searching Google, translating text, and more.
 
 ---
 
-## 🚀 Demo UI
+### 🌐 Frontend (Angular)
 
-Here’s how Jarvis looks in action:
+<img width="1710" height="981" alt="Jarvis" src="https://github.com/user-attachments/assets/738dd6f7-b1c2-4874-8aee-48a3f8cdb473" />
 
-![Jarvis AI UI](![Uploading Jarvis.png…]()
-)
+- Angular CLI
+- Tailwind CSS for styling
+- File upload via `HttpClient`
+- Dynamic UI for voice commands
 
-*(screenshot from the Angular frontend interface)*
-
----
 
 ## 📂 Project Structure
 
